@@ -1,436 +1,218 @@
 const express = require("express");
-const cors = require("cors");
 const fs = require("fs");
+const path = require("path");
 const multer = require("multer");
-
 
 const app = express();
 
+const PORT = process.env.PORT || 3000;
 
-// MIDDLEWARE
 
-app.use(cors());
-
+// Middleware
 app.use(express.json());
-
-app.use(express.static("public"));
-
+app.use(express.urlencoded({ extended: true }));
 
 
+// Public files
+app.use(express.static(path.join(__dirname, "public")));
 
 
-// DATABASE FILES
+// Images folder
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 
-if(!fs.existsSync("products.json")){
+// Files JSON
+const productsFile = path.join(__dirname, "products.json");
+const ordersFile = path.join(__dirname, "orders.json");
 
-    fs.writeFileSync(
-        "products.json",
-        "[]"
-    );
 
+// Create files if not exist
+if (!fs.existsSync(productsFile)) {
+    fs.writeFileSync(productsFile, "[]");
+}
+
+if (!fs.existsSync(ordersFile)) {
+    fs.writeFileSync(ordersFile, "[]");
 }
 
 
-
-if(!fs.existsSync("orders.json")){
-
-    fs.writeFileSync(
-        "orders.json",
-        "[]"
-    );
-
-}
-
-
-
-
-
-// UPLOAD IMAGE
-
-
+// Upload images
 const storage = multer.diskStorage({
-
-
-    destination:function(req,file,cb){
-
-        cb(null,"public/uploads");
-
+    destination: function(req, file, cb){
+        cb(null, "uploads/");
     },
 
-
-    filename:function(req,file,cb){
-
-        cb(
-            null,
-            Date.now()+"-"+file.originalname
-        );
-
+    filename: function(req, file, cb){
+        cb(null, Date.now() + "-" + file.originalname);
     }
-
-
 });
 
 
-
-const upload = multer({
-    storage:storage
-});
-
-
-
-
-
-
-
-
-// FUNCTIONS
-
-
-function getProducts(){
-
-    return JSON.parse(
-        fs.readFileSync("products.json")
-    );
-
-}
-
-
-
-function saveProducts(products){
-
-    fs.writeFileSync(
-        "products.json",
-        JSON.stringify(products,null,2)
-    );
-
-}
-
-
-
-
-
-function getOrders(){
-
-    return JSON.parse(
-        fs.readFileSync("orders.json")
-    );
-
-}
-
-
-
-
-function saveOrders(orders){
-
-    fs.writeFileSync(
-        "orders.json",
-        JSON.stringify(orders,null,2)
-    );
-
-}
-
-
-
-
-
-
-
-
-// TEST SERVER
-
-
-app.get("/",(req,res)=>{
-
-
-res.send("DRIPE.MA SERVER OK");
-
-
-});
-
-
-
-
-
-
-
-
-
-// =====================
-// PRODUCTS
-// =====================
+const upload = multer({ storage });
 
 
 
 // GET PRODUCTS
+app.get("/products", (req,res)=>{
 
+    const products = JSON.parse(
+        fs.readFileSync(productsFile)
+    );
 
-app.get("/products",(req,res)=>{
-
-
-res.json(
-    getProducts()
-);
-
+    res.json(products);
 
 });
 
 
 
+// ADD PRODUCT FROM ADMIN
+app.post("/add-product", upload.single("image"), (req,res)=>{
 
 
+    const products = JSON.parse(
+        fs.readFileSync(productsFile)
+    );
 
 
-// ADD PRODUCT WITH IMAGE
+    const product = {
+
+        id: Date.now(),
+
+        name: req.body.name,
+
+        price: req.body.price,
+
+        category: req.body.category || "",
+
+        image: req.file 
+        ? "/uploads/" + req.file.filename 
+        : ""
+
+    };
 
 
-
-app.post(
-"/products",
-upload.single("image"),
-(req,res)=>{
+    products.push(product);
 
 
-let products=getProducts();
+    fs.writeFileSync(
+        productsFile,
+        JSON.stringify(products,null,2)
+    );
 
 
-
-let product={
-
-
-id:Date.now(),
-
-
-name:req.body.name,
-
-
-price:req.body.price,
-
-
-category:req.body.category,
-
-
-image:req.file
-
-? "/uploads/"+req.file.filename
-
-: ""
-
-
-
-};
-
-
-
-products.push(product);
-
-
-
-saveProducts(products);
-
-
-
-res.json({
-
-message:"Article ajouté",
-
-product
-
-});
+    res.json({
+        message:"Product added",
+        product
+    });
 
 
 });
-
-
-
-
-
-
 
 
 
 // DELETE PRODUCT
+app.delete("/delete-product/:id",(req,res)=>{
 
 
-
-app.delete(
-"/products/:id",
-(req,res)=>{
-
-
-let products=getProducts();
+    let products = JSON.parse(
+        fs.readFileSync(productsFile)
+    );
 
 
-
-products =
-products.filter(
-
-p=>p.id != req.params.id
-
-);
+    products = products.filter(
+        p => p.id != req.params.id
+    );
 
 
+    fs.writeFileSync(
+        productsFile,
+        JSON.stringify(products,null,2)
+    );
 
-saveProducts(products);
 
-
-
-res.json({
-
-message:"Article supprimé"
-
-});
+    res.json({
+        message:"Deleted"
+    });
 
 
 });
 
 
 
-
-
-
-
-
-
-// =====================
 // ORDERS CLIENTS
-// =====================
-
-
-
-// GET ORDERS
-
-
 app.get("/orders",(req,res)=>{
 
 
-res.json(
-getOrders()
-);
+    const orders = JSON.parse(
+        fs.readFileSync(ordersFile)
+    );
+
+
+    res.json(orders);
 
 
 });
-
-
-
-
 
 
 
 // ADD ORDER
+app.post("/order",(req,res)=>{
 
 
-
-app.post("/orders",(req,res)=>{
-
-
-let orders=getOrders();
+    const orders = JSON.parse(
+        fs.readFileSync(ordersFile)
+    );
 
 
+    const order = {
 
-let order={
+        id: Date.now(),
 
+        client:req.body.client,
 
-id:Date.now(),
+        phone:req.body.phone,
 
+        product:req.body.product,
 
-client:req.body.client,
+        status:"En attente"
 
-
-phone:req.body.phone,
-
-
-address:req.body.address,
-
-
-product:req.body.product,
+    };
 
 
-status:"En attente"
+    orders.push(order);
 
 
-
-};
-
-
-
-orders.push(order);
+    fs.writeFileSync(
+        ordersFile,
+        JSON.stringify(orders,null,2)
+    );
 
 
-
-saveOrders(orders);
-
-
-
-res.json({
-
-message:"Commande enregistrée",
-
-order
-
-});
+    res.json({
+        message:"Order saved"
+    });
 
 
 });
 
 
 
+// HOME
+app.get("*",(req,res)=>{
 
-
-
-
-
-
-// DELETE ORDER (OPTION)
-
-
-
-app.delete("/orders/:id",(req,res)=>{
-
-
-let orders=getOrders();
-
-
-
-orders =
-orders.filter(
-
-o=>o.id != req.params.id
-
-);
-
-
-
-saveOrders(orders);
-
-
-
-res.json({
-
-message:"Commande supprimée"
+    res.sendFile(
+        path.join(__dirname,"public","index.html")
+    );
 
 });
-
-
-});
-
-
-
-
-
-
 
 
 
 // START SERVER
+app.listen(PORT,()=>{
 
-
-app.listen(3000,()=>{
-
-
-console.log(
-"SERVER RUNNING PORT 3000"
-);
-
+    console.log(
+        "SERVER RUNNING ON PORT " + PORT
+    );
 
 });
