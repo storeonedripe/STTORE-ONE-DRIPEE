@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ADMIN LOGIN - DRIPE.MA</title>
+
+
+<style>
+
+body{
+
+margin:0;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:#111;
+font-family:Arial;
+
+}
+
+
+.login{
+
+background:white;
+width:350px;
+padding:30px;
+border-radius:15px;
+text-align:center;
+
+}
+
+
+h2{
+
+color:#00d9ff;
+
+}
+
+
+input{
+
+width:90%;
+padding:12px;
+margin:10px;
+border:1px solid #ccc;
+border-radius:8px;
+
+}
+
+
+
+button{
+
+width:95%;
+padding:12px;
+background:#00d9ff;
+border:0;
+border-radius:8px;
+cursor:pointer;
+font-size:16px;
+
+}
+
+
+button:hover{
+
+background:#00b8d9;
+
+}
+
+
+
+#error{
+
+color:red;
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+
+<div class="login">
+
+
+<h2>DRIPE.MA ADMIN</h2>
+
+
+<input id="username" placeholder="Username">
+
+
+<input id="password" type="password" placeholder="Password">
+
+
+<button onclick="login()">
+Login
+</button>
+
+
+<p id="error"></p>
+
+
+</div>
+
+
+
+
+<script>
+
+
+function login(){
+
+
+let user =
+document.getElementById("username").value;
+
+
+let pass =
+document.getElementById("password").value;
+
+
+
+// بيانات الدخول
+
+if(user=="admin" && pass=="123456"){
+
+
+localStorage.setItem("admin","true");
+
+
+window.location.href="admin.html";
+
+
+}
+
+else{
+
+
+document.getElementById("error").innerHTML=
+"Login incorrect";
+
+
+}
+
+
+}
+
+
+</script>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,180 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f4f4f4;
+    color:#222;
+}
+
+header{
+    background:#000;
+    color:#fff;
+    padding:25px;
+    text-align:center;
+}
+
+header h1{
+    margin-bottom:10px;
+}
+
+.container{
+    width:90%;
+    max-width:1200px;
+    margin:30px auto;
+}
+
+h2{
+    margin:20px 0;
+}
+
+/* Produits */
+
+.products{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:#fff;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,.15);
+    overflow:hidden;
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+.card img{
+    width:100%;
+    height:260px;
+    object-fit:cover;
+}
+
+.card h3{
+    padding:10px;
+}
+
+.card p{
+    padding:0 10px;
+    color:#666;
+}
+
+.price{
+    padding:10px;
+    font-size:22px;
+    font-weight:bold;
+}
+
+/* Boutons */
+
+button{
+    width:100%;
+    padding:12px;
+    background:#000;
+    color:#fff;
+    border:none;
+    cursor:pointer;
+    font-size:16px;
+    transition:.3s;
+}
+
+button:hover{
+    background:#333;
+}
+
+/* Panier */
+
+.panier{
+    background:#fff;
+    margin-top:40px;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,.15);
+}
+
+#panier p{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #ddd;
+    padding:12px 0;
+}
+
+#panier button{
+    width:auto;
+    background:red;
+    padding:8px 15px;
+}
+
+#panier button:hover{
+    background:#b30000;
+}
+
+#total{
+    font-size:24px;
+    color:#000;
+}
+
+/* Formulaire */
+
+form{
+    background:#fff;
+    margin-top:40px;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,.15);
+}
+
+input,
+textarea{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border:1px solid #ccc;
+    border-radius:5px;
+    font-size:16px;
+}
+
+textarea{
+    resize:none;
+    height:120px;
+}
+
+form button{
+    margin-top:15px;
+}
+
+/* Responsive */
+
+@media(max-width:768px){
+
+    header h1{
+        font-size:26px;
+    }
+
+    .products{
+        grid-template-columns:1fr;
+    }
+
+    .container{
+        width:95%;
+    }
+
+    #panier p{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:10px;
+    }
+
+    #panier button{
+        width:100%;
+    }
+
+}
